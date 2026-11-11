@@ -18,4 +18,6 @@ file(GLOB_RECURSE SOURCES
 
 add_executable(FyleEncryptor ${SOURCES})
 
+target_include_directories(FyleEncryptor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
 target_link_libraries(FyleEncryptor PRIVATE Qt6::Widgets)
