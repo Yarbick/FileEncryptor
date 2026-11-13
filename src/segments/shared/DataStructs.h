@@ -8,7 +8,6 @@
 #include <cstdint>
 
 
-
 namespace ContainerFormat {
     inline constexpr size_t HEADER_BYTES_SIZE = 12, MAGIC_BYTES_SIZE = 7;
     inline constexpr uint8_t MAGIC_BYTES[] = {'Y', 'A', 'R', 'B', 'I', 'C', 'K'};
@@ -25,4 +24,10 @@ struct FilePacket {
 struct Query {
     AlgorithmType algorithm;
     ModeType mode;
+};
+
+
+struct ProcessResponse {
+    bool isSuccess;
+    std::string message;
 };

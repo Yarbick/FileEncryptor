@@ -7,14 +7,14 @@ class BaseAlgorithm {
 public:
     virtual ~BaseAlgorithm() = default;
 
-    virtual FilePacket encrypt(const FilePacket &inputFile);
+    virtual FilePacket encrypt(const FilePacket &inputFilePacket);
 
-    virtual FilePacket decrypt(const FilePacket &inputFile);
+    virtual FilePacket decrypt(const FilePacket &inputFilePacket);
 
 protected:
     virtual void clearOldData() = 0;
 
-    virtual void prepareData(const FilePacket &inputFile) = 0;
+    virtual void prepareData(const FilePacket &inputFilePacket) = 0;
 
     virtual void runEncrypt() = 0;
 

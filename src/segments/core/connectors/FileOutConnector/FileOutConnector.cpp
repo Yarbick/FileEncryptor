@@ -48,13 +48,14 @@ namespace FileOutConnector {
     }
 
 
-    void transmitData(const FilePacket &inFilePacket, const Query &query) {
+    void transmitData(const std::string &dirname, const FilePacket &inFilePacket, const Query &query) {
+        std::string filename = dirname + '/';
         if (query.mode == ModeType::ENCRYPT) {
-            const std::string filename = inFilePacket.params.at("filename") + '.' + ENCRYPTED_FILE_EXTENSION;
+            filename += inFilePacket.params.at("filename") + '.' + ENCRYPTED_FILE_EXTENSION;
             buildEncryptedFile(filename, inFilePacket);
         }
         if (query.mode == ModeType::DECRYPT) {
-            const std::string filename = inFilePacket.params.at("filename") + '.' + inFilePacket.params.at("extension");
+            filename += inFilePacket.params.at("filename") + '.' + inFilePacket.params.at("extension");
             buildDecryptedFile(filename, inFilePacket);
         }
     }

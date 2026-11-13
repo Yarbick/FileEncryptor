@@ -12,5 +12,5 @@
 
 
 namespace FileOutConnector {
-    void transmitData(const FilePacket &inFilePacket, const Query &query);
+    void transmitData(const std::string &dirname, const FilePacket &inFilePacket, const Query &query);
 }
