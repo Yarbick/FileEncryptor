@@ -1,22 +1,27 @@
-#include "FileInputConnector.h"
+#include "FileInConnector.h"
 
 
-namespace FileInputConnector {
+namespace FileInConnector {
     namespace {
+        /// Проверка файла на ошибки
         void checkFile(std::ifstream &fin) {
             if (not fin.is_open())
                 throw std::runtime_error("Failed to open file");
 
+            // Определение размера файла
             fin.seekg(0, std::ios::end);
             const std::streamsize fileSize = fin.tellg();
             fin.seekg(0, std::ios::beg);
 
-            if (fileSize <= 0) throw std::runtime_error("File is empty");
+            if (fileSize <= 0)
+                throw std::runtime_error("File is empty");
         }
 
+        /// Дополнительная проверка для зашифрованных файлов
         void checkEncryptedFile(std::ifstream &fin) {
             checkFile(fin);
 
+            // Определение размера файла
             fin.seekg(0, std::ios::end);
             const size_t fileSize = fin.tellg();
             fin.seekg(0, std::ios::beg);
@@ -24,6 +29,7 @@ namespace FileInputConnector {
             if (fileSize < ContainerFormat::HEADER_BYTES_SIZE)
                 throw std::runtime_error("File is empty");
 
+            // Проверка магических байтов
             std::vector<char> magicBytes(ContainerFormat::MAGIC_BYTES_SIZE);
             fin.read(magicBytes.data(), ContainerFormat::MAGIC_BYTES_SIZE);
 
@@ -32,6 +38,7 @@ namespace FileInputConnector {
                     throw std::runtime_error("The file is not encrypted");
             }
 
+            // Проверка версии
             uint8_t version = 0;
             fin.read(reinterpret_cast<char *>(&version), sizeof(version));
 
@@ -40,7 +47,9 @@ namespace FileInputConnector {
         }
 
 
+        /// Чтение данных из тела файла
         void readFileBody(std::ifstream &fin, FilePacket &outFilePacket) {
+            // Определение размера тела файла
             const std::streampos startPos = fin.tellg();
             fin.seekg(0, std::ios::end);
             const std::streamsize bodySize = fin.tellg() - startPos;
@@ -51,17 +60,20 @@ namespace FileInputConnector {
         }
 
 
-        void loadUserFile(const std::string &filename, FilePacket &outFilePacket) {
-            std::ifstream fin(filename, std::ios::binary);
+        /// Загрузка файла для шифровки
+        void loadUserFile(const std::string &filepath, FilePacket &outFilePacket) {
+            std::ifstream fin(filepath, std::ios::binary);
             checkFile(fin);
 
             readFileBody(fin, outFilePacket);
         }
 
-        void loadEncryptedFile(const std::string &filename, FilePacket &outFilePacket) {
-            std::ifstream fin(filename, std::ios::binary);
+        /// Загрузка файла для расшифровки
+        void loadEncryptedFile(const std::string &filepath, FilePacket &outFilePacket) {
+            std::ifstream fin(filepath, std::ios::binary);
             checkEncryptedFile(fin);
 
+            // Чтение параметров
             uint32_t paramsSize = 0;
             fin.read(reinterpret_cast<char *>(&paramsSize), sizeof(paramsSize));
 
@@ -84,10 +96,10 @@ namespace FileInputConnector {
     }
 
 
-    void transmitData(const std::string &filename, FilePacket &outFilePacket, const Query &query) {
+    void transmitData(const std::string &filepath, FilePacket &outFilePacket, const Query &query) {
         if (query.mode == ModeType::ENCRYPT)
-            loadUserFile(filename, outFilePacket);
+            loadUserFile(filepath, outFilePacket);
         if (query.mode == ModeType::DECRYPT)
-            loadEncryptedFile(filename, outFilePacket);
+            loadEncryptedFile(filepath, outFilePacket);
     }
 }

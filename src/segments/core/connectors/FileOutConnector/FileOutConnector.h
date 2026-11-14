@@ -11,6 +11,15 @@
 #include <cstdint>
 
 
+/**
+ * @brief Коннектор, выгружающий данные (ответ алгоритма) в файл в выбранную папку
+ */
 namespace FileOutConnector {
-    void transmitData(const std::string &dirname, const FilePacket &inFilePacket, const Query &query);
+    /**
+     * @brief Запуск транспортировки данных
+     * @param dirpath Путь к папке, в которую сохранится файл
+     * @param inFilePacket Данные, которые сохранятся в файла
+     * @param query Настройки запроса
+     */
+    void transmitData(const std::string &dirpath, const FilePacket &inFilePacket, const Query &query);
 }

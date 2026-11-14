@@ -3,6 +3,7 @@
 
 namespace FileOutConnector {
     namespace {
+        /// Проверка файла на ошибки
         void checkFile(const std::ofstream &fout) {
             if (!fout.is_open()) {
                 throw std::runtime_error("Failed to open file");
@@ -10,16 +11,19 @@ namespace FileOutConnector {
         }
 
 
+        /// Сборка тела файла
         void buildFileBody(std::ofstream &fout, const FilePacket &inFilePacket) {
             const auto bodySize = static_cast<std::streamsize>(inFilePacket.data.size());
             fout.write(reinterpret_cast<const char *>(inFilePacket.data.data()), bodySize);
         }
 
 
-        void buildEncryptedFile(const std::string &filename, const FilePacket &inFilePacket) {
-            std::ofstream fout(filename, std::ios::binary);
+        /// Сборка зашифрованного файла
+        void buildEncryptedFile(const std::string &filepath, const FilePacket &inFilePacket) {
+            std::ofstream fout(filepath, std::ios::binary);
             checkFile(fout);
 
+            // Запись заголовков
             fout.write(reinterpret_cast<const char *>(ContainerFormat::MAGIC_BYTES), ContainerFormat::MAGIC_BYTES_SIZE);
             fout.write(reinterpret_cast<const char *>(&ContainerFormat::VERSION), sizeof(ContainerFormat::VERSION));
 
@@ -39,8 +43,9 @@ namespace FileOutConnector {
             buildFileBody(fout, inFilePacket);
         }
 
-        void buildDecryptedFile(const std::string &filename, const FilePacket &inFilePacket) {
-            std::ofstream fout(filename, std::ios::binary);
+        /// Сборка расшифрованного файла
+        void buildDecryptedFile(const std::string &filepath, const FilePacket &inFilePacket) {
+            std::ofstream fout(filepath, std::ios::binary);
             checkFile(fout);
 
             buildFileBody(fout, inFilePacket);
@@ -48,15 +53,16 @@ namespace FileOutConnector {
     }
 
 
-    void transmitData(const std::string &dirname, const FilePacket &inFilePacket, const Query &query) {
-        std::string filename = dirname + '/';
+    void transmitData(const std::string &dirpath, const FilePacket &inFilePacket, const Query &query) {
+        // Сборка нужного пути к файлу и запуск передачи
+        std::string filepath = dirpath + '/';
         if (query.mode == ModeType::ENCRYPT) {
-            filename += inFilePacket.params.at("filename") + '.' + ENCRYPTED_FILE_EXTENSION;
-            buildEncryptedFile(filename, inFilePacket);
+            filepath += inFilePacket.params.at("filename") + '.' + ENCRYPTED_FILE_EXTENSION;
+            buildEncryptedFile(filepath, inFilePacket);
         }
         if (query.mode == ModeType::DECRYPT) {
-            filename += inFilePacket.params.at("filename") + '.' + inFilePacket.params.at("extension");
-            buildDecryptedFile(filename, inFilePacket);
+            filepath += inFilePacket.params.at("filename") + '.' + inFilePacket.params.at("extension");
+            buildDecryptedFile(filepath, inFilePacket);
         }
     }
 }
