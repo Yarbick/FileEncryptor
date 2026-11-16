@@ -1,14 +1,37 @@
-#include <QApplication>
-#include <QWidget>
+#include "segments/core/Core/Core.h"
+#include "segments/shared/Types.h"
+#include "segments/shared/DataStructs.h"
+
+#include <iostream>
+#include <string>
 
 
-int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
+int main() {
+    std::string inFilepath, outDirpath;
+    std::getline(std::cin, inFilepath);
+    std::getline(std::cin, outDirpath);
 
-    QWidget window;
-    window.setWindowTitle("FyleEncryptor - Тест Qt6");
-    window.resize(400, 300);
-    window.show();
+    FilePacket mainFilePacket;
+    Query query{};
 
-    return QApplication::exec();
+    int alg, mode;
+    std::cin >> alg >> mode;
+
+    if (mode == 0) query.mode = ModeType::ENCRYPT;
+    else query.mode = ModeType::DECRYPT;
+
+    if (query.mode == ModeType::DECRYPT) {
+        std::cin >> mainFilePacket.params["hashKey"];
+    }
+
+    ProcessResponse response = Core::processQuery(inFilepath, outDirpath, mainFilePacket, query);
+    std::cout << response.message << std::endl;
+
+    if (query.mode == ModeType::ENCRYPT) {
+        for (const auto &[key, value]: response.params) {
+            std::cout << key << ' ' << value << std::endl;
+        }
+    }
+
+    return 0;
 }

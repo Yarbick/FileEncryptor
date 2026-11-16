@@ -7,7 +7,7 @@
  * @brief Типы алгоритмов
  */
 enum class AlgorithmType : uint8_t {
-    // TODO: вставить виды алгоритмов
+    HBA = 0,
 };
 
 

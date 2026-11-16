@@ -1,19 +1,9 @@
 #include "BaseAlgorithm.h"
 
 
-FilePacket BaseAlgorithm::encrypt(const FilePacket &inFilePacket) {
+void BaseAlgorithm::process(FilePacket &inFilePacket, ProcessResponse &processResponse) {
     clearOldData();
     prepareData(inFilePacket);
-    runEncrypt();
-
-    return processResult();
-}
-
-
-FilePacket BaseAlgorithm::decrypt(const FilePacket &inFilePacket) {
-    clearOldData();
-    prepareData(inFilePacket);
-    runDecrypt();
-
-    return processResult();
+    runProcess();
+    prepareResult(inFilePacket, processResponse);
 }

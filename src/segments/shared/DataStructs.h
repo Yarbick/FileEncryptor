@@ -53,4 +53,6 @@ struct ProcessResponse {
     bool isSuccess;
     /// Сообщение об ошибке (или "OK", если её нет)
     std::string message;
+    /// Доп. параметры
+    std::map<std::string, std::string> params;
 };

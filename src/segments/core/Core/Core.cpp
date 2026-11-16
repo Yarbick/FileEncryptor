@@ -34,26 +34,53 @@ namespace Core {
             inFilePacket.params["filename"] = inFilepath.substr(filenameSeparatorIdx + 1, filenameLength);
             inFilePacket.params["extension"] = inFilepath.substr(extensionSeparatorIdx + 1);
         }
+
+        /// Выбор алгоритма по параметрам запроса
+        BaseAlgorithm &getAlgorithm(const Query &query) {
+            switch (query.algorithm) {
+                case AlgorithmType::HBA:
+                    if (query.mode == ModeType::ENCRYPT) return HBA_Encrypt::instance();
+                    return HBA_Decrypt::instance();
+            }
+
+            throw std::runtime_error("Unknown algorithm");
+        }
     }
 
 
-    ProcessResponse processQuery(const std::string &inFilepath, std::string &outDirpath, FilePacket &inFilePacket,
+    ProcessResponse processQuery(const std::string &inFilepath, std::string &outDirpath, FilePacket &mainFilePacket,
                                  const Query &query) {
         try {
-            // Обработка входных данных
-            FileInConnector::transmitData(inFilepath, inFilePacket, query);
-            preparePaths(inFilepath, outDirpath, inFilePacket, query);
+            ProcessResponse processResponse;
 
-            // Выбор и запуск алгоритма
-            FilePacket outFilePacket;
-            // TODO: сделать выбор алгоритма
+            // Обработка входных данных
+            FileInConnector::transmitData(inFilepath, mainFilePacket, query);
+            preparePaths(inFilepath, outDirpath, mainFilePacket, query);
+
+            // Выбор алгоритмов
+            // TODO: BaseAlgorithm &main_Algorithm = getAlgorithm();
+            BaseAlgorithm &HBA_Algorithm = getAlgorithm({AlgorithmType::HBA, query.mode});
+
+            if (query.mode == ModeType::ENCRYPT) {
+                // Общая шифровка через хеширование байтов
+                HBA_Algorithm.process(mainFilePacket, processResponse);
+
+                // TODO: Дописать логику с главным алгоритмом
+            } else if (query.mode == ModeType::DECRYPT) {
+                // TODO: Дописать логику с главным алгоритмом
+
+                // Общая расшифровка через дехеширование байтов
+                HBA_Algorithm.process(mainFilePacket, processResponse);
+            }
 
             // Сохранение результата в файл
-            FileOutConnector::transmitData(outDirpath, outFilePacket, query);
+            FileOutConnector::transmitData(outDirpath, mainFilePacket, query);
 
-            return ProcessResponse(true, "OK");
+            processResponse.isSuccess = true;
+            processResponse.message = "OK";
+            return processResponse;
         } catch (const std::exception &error) {
-            return ProcessResponse(false, error.what());
+            return ProcessResponse(false, error.what(), {});
         }
     }
 }

@@ -11,20 +11,15 @@ public:
     virtual ~BaseAlgorithm() = default;
 
     /**
-     * @brief Шифрование данных
-     * @param inFilePacket Файловый пакет для шифрования
-     * @return Отшифрованный файловый пакет
+     * @brief Обработка данных по алгоритму. Перезапишет данные в тот же файловый пакет
+     * @param inFilePacket Файловый пакет с данными для обработки
+     * @param processResponse Статус ответа программы, куда запишутся секретные параметры
      */
-    virtual FilePacket encrypt(const FilePacket &inFilePacket);
-
-    /**
-     * @brief Расшифрование данных
-     * @param inFilePacket Файловый пакет для расшифрования
-     * @return Расшифрованный файловый пакет
-     */
-    virtual FilePacket decrypt(const FilePacket &inFilePacket);
+    void process(FilePacket &inFilePacket, ProcessResponse &processResponse);
 
 protected:
+    BaseAlgorithm() = default;
+
     /**
      * @brief Очистка алгоритма от старых данных
      */
@@ -37,18 +32,39 @@ protected:
     virtual void prepareData(const FilePacket &inFilePacket) = 0;
 
     /**
-     * @brief Запускает процесс шифрования
+     * @brief Запускает алгоритм
      */
-    virtual void runEncrypt() = 0;
-
-    /**
-     * @brief Запускает процесс расшифрования
-     */
-    virtual void runDecrypt() = 0;
+    virtual void runProcess() = 0;
 
     /**
      * @brief Упаковка ответа алгоритма в файловый пакет
-     * @return Файловый пакет с ответом
+     * @param outFilePacket Файловый пакет, в который запишется результат
+     * @param processResponse Статус ответа программы, куда запишутся секретные параметры
      */
-    virtual FilePacket processResult() = 0;
+    virtual void prepareResult(FilePacket &outFilePacket, ProcessResponse &processResponse) = 0;
+};
+
+
+/**
+ * @brief "Прослойка" для классов, позволяющая работать лишь с одним экземпляром
+ * @tparam Child Алгоритм, который подключается к прослойке
+ */
+template<class Child>
+class StaticAlgorithm : public BaseAlgorithm {
+public:
+    StaticAlgorithm(const StaticAlgorithm &) = delete;
+
+    StaticAlgorithm &operator=(const StaticAlgorithm &) = delete;
+
+    /**
+     * @brief Получение экземпляра класса
+     * @return Экземпляр класса
+     */
+    static Child &instance() {
+        static Child object;
+        return object;
+    }
+
+protected:
+    StaticAlgorithm() = default;
 };
