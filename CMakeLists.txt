@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.2)
-project(FyleEncryptor)
+project(FileEncryptor)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,8 +16,8 @@ file(GLOB_RECURSE SOURCES
         "src/*.ui"
 )
 
-add_executable(FyleEncryptor ${SOURCES})
+add_executable(FileEncryptor ${SOURCES})
 
-target_include_directories(FyleEncryptor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_include_directories(FileEncryptor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
-target_link_libraries(FyleEncryptor PRIVATE Qt6::Widgets)
+target_link_libraries(FileEncryptor PRIVATE Qt6::Widgets)
