@@ -44,6 +44,7 @@ void HBA_Encrypt::runProcess() {
 
 
 void HBA_Encrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &processResponse) {
+    constexpr uint64_t blockSize = sizeof(uint64_t);
     const auto &rawBytes = *rawBytesPtr;
 
     // Запись параметров
@@ -51,12 +52,13 @@ void HBA_Encrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &proc
     outFilePacket.params["originalBodySize"] = std::to_string(rawBytes.size());
 
     // Запись хешированных блоков с учётом разделения на байты
-    outFilePacket.data.resize(hashedBlocks.size() * 8);
+    outFilePacket.data.resize(hashedBlocks.size() * blockSize);
     for (uint64_t i = 0; i < hashedBlocks.size(); i++) {
         uint64_t value = hashedBlocks[i];
-        for (int byteIdx = 7; byteIdx >= 0; byteIdx--) {
-            outFilePacket.data[i * 8 + byteIdx] = static_cast<uint8_t>(value & 0xFF);
-            value >>= 8;
+
+        for (int byteIdx = blockSize - 1; byteIdx >= 0; byteIdx--) {
+            outFilePacket.data[i * blockSize + byteIdx] = static_cast<uint8_t>(value & 0xFF);
+            value >>= BYTE;
         }
     }
 }

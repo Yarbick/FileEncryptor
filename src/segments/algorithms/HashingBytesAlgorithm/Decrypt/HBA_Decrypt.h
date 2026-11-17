@@ -2,8 +2,9 @@
 
 #include "segments/algorithms/BaseAlgorithm/BaseAlgorithm.h"
 #include "segments/algorithms/sharedFunctions/MathUtils/MathUtils.h"
-#include "segments/shared/DataStructs.h"
+#include "segments/algorithms/HashingBytesAlgorithm/shared/HBA_Constants.h"
 #include "segments/shared/Constants.h"
+#include "segments/shared/DataStructs.h"
 
 #include <vector>
 #include <cstdint>

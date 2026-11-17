@@ -9,6 +9,8 @@ void HBA_Decrypt::clearOldData() {
 
 
 void HBA_Decrypt::prepareData(const FilePacket &inFilePacket) {
+    constexpr uint64_t blockSize = sizeof(uint64_t);
+
     // Получение параметров для алгоритма
     const std::string &hashKey = inFilePacket.params.at("hashKey");
     const uint64_t separatorIdx = hashKey.find('&');
@@ -19,17 +21,17 @@ void HBA_Decrypt::prepareData(const FilePacket &inFilePacket) {
     subCoef = std::stoull(hashKey.substr(separatorIdx + 1));
 
     // Изменение размера хешированных байтов с учётом изменения типа данных
-    const uint64_t newSize = inFilePacket.data.size() / 8;
+    const uint64_t newSize = inFilePacket.data.size() / blockSize;
     hashBlocks.resize(newSize);
 
     const uint64_t originalBodySize = std::stoull(inFilePacket.params.at("originalBodySize"));
     rawBytes.resize(originalBodySize);
 
-    // Объединение хешированных байтов в блоки
     for (uint64_t i = 0; i < newSize; i++) {
         hashBlocks[i] = 0;
-        for (int byteIdx = 0; byteIdx <= 7; byteIdx++) {
-            hashBlocks[i] = (hashBlocks[i] << 8) | inFilePacket.data[i * 8 + byteIdx];
+
+        for (int byteIdx = 0; byteIdx < blockSize; byteIdx++) {
+            hashBlocks[i] = (hashBlocks[i] << BYTE) | inFilePacket.data[i * blockSize + byteIdx];
         }
     }
 }
