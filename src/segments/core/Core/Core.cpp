@@ -35,6 +35,27 @@ namespace Core {
             inFilePacket.params["extension"] = inFilepath.substr(extensionSeparatorIdx + 1);
         }
 
+
+        /// Объединение двух ключей в один
+        void mergeSubKeys(ProcessResponse &processResponse) {
+            processResponse.params["mainKey"] =
+                    processResponse.params["hashKey"] + '%' + processResponse.params["algorithmKey"];
+            processResponse.params.erase("hashKey");
+            processResponse.params.erase("algorithmKey");
+        }
+
+        /// Выделение двух ключей из одного
+        void cutMainKey(FilePacket &mainFilePacket) {
+            const uint64_t separatorIdx = mainFilePacket.params["mainKey"].find('%');
+            if (separatorIdx == std::string::npos)
+                throw std::runtime_error("Invalid mainKey format");
+
+            mainFilePacket.params["hashKey"] = mainFilePacket.params["mainKey"].substr(0, separatorIdx);
+            mainFilePacket.params["algorithmKey"] = mainFilePacket.params["mainKey"].substr(separatorIdx + 1);
+            mainFilePacket.params.erase("mainKey");
+        }
+
+
         /// Выбор алгоритма по параметрам запроса
         BaseAlgorithm &getAlgorithm(const Query &query) {
             switch (query.algorithm) {
@@ -69,7 +90,13 @@ namespace Core {
                 HBA_Algorithm.process(mainFilePacket, processResponse);
                 // Основная шифровка через выбранный пользователем алгоритм
                 main_Algorithm.process(mainFilePacket, processResponse);
+
+                // Связывание двух ключей в один
+                mergeSubKeys(processResponse);
             } else if (query.mode == ModeType::DECRYPT) {
+                // Выделение двух ключей в из одного
+                cutMainKey(mainFilePacket);
+
                 // Основная расшифровка через выбранный пользователем алгоритм
                 main_Algorithm.process(mainFilePacket, processResponse);
                 // Общая расшифровка через дехеширование байтов
