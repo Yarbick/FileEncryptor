@@ -7,7 +7,7 @@ void DA_Encrypt::clearOldData() {
 
 
 void DA_Encrypt::prepareData(const FilePacket &inFilePacket) {
-    // Генерация ключ для коэффициентов
+    // Генерация ключа для коэффициентов
     seedKey = rnd();
 
     // Изменение размера зашифрованных блоков с учётом объединения байтов
@@ -40,7 +40,7 @@ void DA_Encrypt::runProcess() {
         // Генерация коэффициента
         const uint16_t multiplierCoef = static_cast<uint16_t>(seedRnd() % MULTIPLIER_MOD) + SHIFT;
 
-        // Рещение Диофантова уравнения
+        // Решение Диофантова уравнения
         x *= multiplierCoef;
         y *= multiplierCoef;
         const uint16_t Q = static_cast<uint16_t>(b / G) xor multiplierCoef;
