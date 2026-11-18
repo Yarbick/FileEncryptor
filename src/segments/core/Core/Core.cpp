@@ -41,9 +41,12 @@ namespace Core {
                 case AlgorithmType::HBA:
                     if (query.mode == ModeType::ENCRYPT) return HBA_Encrypt::instance();
                     return HBA_Decrypt::instance();
+                case AlgorithmType::DA:
+                    if (query.mode == ModeType::ENCRYPT) return DA_Encrypt::instance();
+                    return DA_Decrypt::instance();
+                default:
+                    throw std::runtime_error("Unknown algorithm");
             }
-
-            throw std::runtime_error("Unknown algorithm");
         }
     }
 
@@ -58,17 +61,17 @@ namespace Core {
             preparePaths(inFilepath, outDirpath, mainFilePacket, query);
 
             // Выбор алгоритмов
-            // TODO: BaseAlgorithm &main_Algorithm = getAlgorithm();
+            BaseAlgorithm &main_Algorithm = getAlgorithm(query);
             BaseAlgorithm &HBA_Algorithm = getAlgorithm({AlgorithmType::HBA, query.mode});
 
             if (query.mode == ModeType::ENCRYPT) {
                 // Общая шифровка через хеширование байтов
                 HBA_Algorithm.process(mainFilePacket, processResponse);
-
-                // TODO: Дописать логику с главным алгоритмом
+                // Основная шифровка через выбранный пользователем алгоритм
+                main_Algorithm.process(mainFilePacket, processResponse);
             } else if (query.mode == ModeType::DECRYPT) {
-                // TODO: Дописать логику с главным алгоритмом
-
+                // Основная расшифровка через выбранный пользователем алгоритм
+                main_Algorithm.process(mainFilePacket, processResponse);
                 // Общая расшифровка через дехеширование байтов
                 HBA_Algorithm.process(mainFilePacket, processResponse);
             }

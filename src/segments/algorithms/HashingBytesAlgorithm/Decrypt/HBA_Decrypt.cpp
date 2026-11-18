@@ -9,8 +9,6 @@ void HBA_Decrypt::clearOldData() {
 
 
 void HBA_Decrypt::prepareData(const FilePacket &inFilePacket) {
-    constexpr uint64_t blockSize = sizeof(uint64_t);
-
     // Получение параметров для алгоритма
     const std::string &hashKey = inFilePacket.params.at("hashKey");
     const uint64_t separatorIdx = hashKey.find('&');
@@ -21,7 +19,7 @@ void HBA_Decrypt::prepareData(const FilePacket &inFilePacket) {
     subCoef = std::stoull(hashKey.substr(separatorIdx + 1));
 
     // Изменение размера хешированных байтов с учётом изменения типа данных
-    const uint64_t newSize = inFilePacket.data.size() / blockSize;
+    const uint64_t newSize = inFilePacket.data.size() / HBA_Const::BLOCK_SIZE;
     hashBlocks.resize(newSize);
 
     const uint64_t originalBodySize = std::stoull(inFilePacket.params.at("originalBodySize"));
@@ -30,8 +28,8 @@ void HBA_Decrypt::prepareData(const FilePacket &inFilePacket) {
     for (uint64_t i = 0; i < newSize; i++) {
         hashBlocks[i] = 0;
 
-        for (int byteIdx = 0; byteIdx < blockSize; byteIdx++) {
-            hashBlocks[i] = (hashBlocks[i] << BYTE) | inFilePacket.data[i * blockSize + byteIdx];
+        for (int byteIdx = 0; byteIdx < HBA_Const::BLOCK_SIZE; byteIdx++) {
+            hashBlocks[i] = (hashBlocks[i] << BYTE) | inFilePacket.data[i * HBA_Const::BLOCK_SIZE + byteIdx];
         }
     }
 }
@@ -39,12 +37,12 @@ void HBA_Decrypt::prepareData(const FilePacket &inFilePacket) {
 
 void HBA_Decrypt::runProcess() {
     // Подсчёт степеней для основания хеша
-    std::vector<uint64_t> hashPowers(BLOCK_SIZE);
+    std::vector<uint64_t> hashPowers(HBA_Const::BLOCK_LENGTH);
     hashPowers[0] = 1;
-    for (int i = 1; i < BLOCK_SIZE; i++) hashPowers[i] = hashPowers[i - 1] * hashBase;
+    for (int i = 1; i < HBA_Const::BLOCK_LENGTH; i++) hashPowers[i] = hashPowers[i - 1] * hashBase;
 
     // Инвертированный subCoef
-    const uint64_t invSubCoef = MathUtils::Ferman(subCoef, HASH_MOD);
+    const uint64_t invSubCoef = MathUtils::Ferman(subCoef, HBA_Const::HASH_MOD);
 
     // Дехеширование байтов
     for (uint64_t i = 0; i < hashBlocks.size(); i++) {
@@ -52,11 +50,11 @@ void HBA_Decrypt::runProcess() {
 
         // Дополнение умножением на доп. коэффициент и связью с прошлым блоком через XOR
         if (i != 0) block ^= hashBlocks[i - 1];
-        block = static_cast<uint64_t>((static_cast<__uint128_t>(block) * invSubCoef) % HASH_MOD);
+        block = static_cast<uint64_t>((static_cast<__uint128_t>(block) * invSubCoef) % HBA_Const::HASH_MOD);
 
         // Простое дехеширование
-        for (int power = BLOCK_SIZE - 1; power >= 0; power--) {
-            const uint64_t idx = i * BLOCK_SIZE + (BLOCK_SIZE - power - 1);
+        for (int power = HBA_Const::BLOCK_LENGTH - 1; power >= 0; power--) {
+            const uint64_t idx = i * HBA_Const::BLOCK_LENGTH + (HBA_Const::BLOCK_LENGTH - power - 1);
             if (idx < rawBytes.size()) rawBytes[idx] = block / hashPowers[power];
             block %= hashPowers[power];
         }

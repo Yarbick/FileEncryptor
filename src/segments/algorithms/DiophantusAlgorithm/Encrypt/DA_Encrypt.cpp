@@ -11,7 +11,7 @@ void DA_Encrypt::prepareData(const FilePacket &inFilePacket) {
     seedKey = rnd();
 
     // Изменение размера зашифрованных блоков с учётом объединения байтов
-    encryptedBlocks.resize((inFilePacket.data.size() + BLOCK_SIZE - 1) / BLOCK_SIZE);
+    encryptedBlocks.resize((inFilePacket.data.size() + DA_Const::BLOCK_LENGTH - 1) / DA_Const::BLOCK_LENGTH);
 
     rawBytesPtr = &inFilePacket.data;
 }
@@ -24,8 +24,8 @@ void DA_Encrypt::runProcess() {
     std::mt19937_64 seedRnd(seedKey); // Для каждого блока будет генерироваться отдельный коэффициент
     for (uint64_t i = 0; i < rawBytes.size(); i += 2) {
         // Двигаем биты на +1 влево для избежания деления на 0
-        const uint16_t a = static_cast<uint16_t>(rawBytes[i]) + SHIFT;
-        const uint16_t b = static_cast<uint16_t>(i + 1 < rawBytes.size() ? rawBytes[i + 1] : 0) + SHIFT;
+        const uint16_t a = static_cast<uint16_t>(rawBytes[i]) + DA_Const::SHIFT;
+        const uint16_t b = static_cast<uint16_t>(i + 1 < rawBytes.size() ? rawBytes[i + 1] : 0) + DA_Const::SHIFT;
 
         // Решение расширенного алгоритма Евклида
         int32_t x, y;
@@ -38,7 +38,7 @@ void DA_Encrypt::runProcess() {
         }
 
         // Генерация коэффициента
-        const uint16_t multiplierCoef = static_cast<uint16_t>(seedRnd() % MULTIPLIER_MOD) + SHIFT;
+        const uint16_t multiplierCoef = static_cast<uint16_t>(seedRnd() % DA_Const::MULTIPLIER_MOD) + DA_Const::SHIFT;
 
         // Решение Диофантова уравнения
         x *= multiplierCoef;
@@ -52,7 +52,6 @@ void DA_Encrypt::runProcess() {
 
 
 void DA_Encrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &processResponse) {
-    constexpr uint64_t blockSize = sizeof(DA_Block);
     const auto &rawBytes = *rawBytesPtr;
 
     // Запись параметров
@@ -60,31 +59,31 @@ void DA_Encrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &proce
     outFilePacket.params["hashedSizeBody"] = std::to_string(rawBytes.size());
 
     // Запись зашифрованных блоков с учётом деления на байты
-    outFilePacket.data.resize(encryptedBlocks.size() * blockSize);
+    outFilePacket.data.resize(encryptedBlocks.size() * DA_Const::BLOCK_SIZE);
     for (uint64_t i = 0; i < encryptedBlocks.size(); i++) {
         DA_Block value(encryptedBlocks[i]);
 
         int prevSize = 0, currSize = sizeof(int32_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
-            outFilePacket.data[i * blockSize + byteIdx] = static_cast<uint8_t>(value.x & 0xFF);
+            outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.x & 0xFF);
             value.x >>= BYTE;
         }
 
         prevSize = currSize, currSize += sizeof(int32_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
-            outFilePacket.data[i * blockSize + byteIdx] = static_cast<uint8_t>(value.y & 0xFF);
+            outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.y & 0xFF);
             value.y >>= BYTE;
         }
 
         prevSize = currSize, currSize += sizeof(uint16_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
-            outFilePacket.data[i * blockSize + byteIdx] = static_cast<uint8_t>(value.Q & 0xFF);
+            outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.Q & 0xFF);
             value.Q >>= BYTE;
         }
 
         prevSize = currSize, currSize += sizeof(uint16_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
-            outFilePacket.data[i * blockSize + byteIdx] = static_cast<uint8_t>(value.G & 0xFF);
+            outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.G & 0xFF);
             value.G >>= BYTE;
         }
     }

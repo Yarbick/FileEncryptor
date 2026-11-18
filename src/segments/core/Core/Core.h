@@ -5,6 +5,8 @@
 #include "segments/algorithms/BaseAlgorithm/BaseAlgorithm.h"
 #include "segments/algorithms/HashingBytesAlgorithm/Encrypt/HBA_Encrypt.h"
 #include "segments/algorithms/HashingBytesAlgorithm/Decrypt/HBA_Decrypt.h"
+#include "segments/algorithms/DiophantusAlgorithm/Encrypt/DA_Encrypt.h"
+#include "segments/algorithms/DiophantusAlgorithm/Decrypt/DA_Decrypt.h"
 #include "segments/shared/DataStructs.h"
 #include "segments/shared/Types.h"
 #include "segments/shared/Constants.h"

@@ -17,11 +17,14 @@ int main() {
     int alg, mode;
     std::cin >> alg >> mode;
 
+    if (alg == 1) query.algorithm = AlgorithmType::DA;
+
     if (mode == 0) query.mode = ModeType::ENCRYPT;
     else query.mode = ModeType::DECRYPT;
 
     if (query.mode == ModeType::DECRYPT) {
         std::cin >> mainFilePacket.params["hashKey"];
+        std::cin >> mainFilePacket.params["algorithmKey"];
     }
 
     ProcessResponse response = Core::processQuery(inFilepath, outDirpath, mainFilePacket, query);
