@@ -23,4 +23,14 @@ namespace MathUtils {
      * @return Число: (N ^ (-1)) % MOD
      */
     uint64_t Ferman(uint64_t N, uint64_t mod);
+
+    /**
+     * @brief Расширенный алгоритм Евклида (для байтов)
+     * @param a - коэффициент a (первый байт)
+     * @param b - коэффициент b (второй байт)
+     * @param x - коэффициент x
+     * @param y - коэффициент y
+     * @return Число: gcd(a, b)
+     */
+    uint16_t extendedGCD(uint16_t a, uint16_t b, int32_t &x, int32_t &y);
 }

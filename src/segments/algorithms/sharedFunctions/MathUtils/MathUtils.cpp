@@ -16,3 +16,20 @@ uint64_t MathUtils::binPowMod(__uint128_t base, __uint128_t power, const __uint1
 uint64_t MathUtils::Ferman(const uint64_t N, const uint64_t mod) {
     return binPowMod(N, mod - 2, mod);
 }
+
+
+uint16_t MathUtils::extendedGCD(const uint16_t a, const uint16_t b, int32_t &x, int32_t &y) {
+    if (b == 0) {
+        x = 1;
+        y = 0;
+
+        return a;
+    }
+
+    int32_t x1, y1;
+    const uint16_t G = extendedGCD(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - (a / b) * y1;
+
+    return G;
+}
