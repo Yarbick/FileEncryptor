@@ -8,7 +8,8 @@
  */
 enum class AlgorithmType : uint8_t {
     HBA = 0,
-    DA = 1
+    DA = 1,
+    TA = 2
 };
 
 

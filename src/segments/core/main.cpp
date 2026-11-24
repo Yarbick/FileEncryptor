@@ -18,6 +18,7 @@ int main() {
     std::cin >> alg >> mode;
 
     if (alg == 1) query.algorithm = AlgorithmType::DA;
+    if (alg == 2) query.algorithm = AlgorithmType::TA;
 
     if (mode == 0) query.mode = ModeType::ENCRYPT;
     else query.mode = ModeType::DECRYPT;

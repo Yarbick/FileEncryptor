@@ -65,6 +65,9 @@ namespace Core {
                 case AlgorithmType::DA:
                     if (query.mode == ModeType::ENCRYPT) return DA_Encrypt::instance();
                     return DA_Decrypt::instance();
+                case AlgorithmType::TA:
+                    if (query.mode == ModeType::ENCRYPT) return TA_Encrypt::instance();
+                    return TA_Decrypt::instance();
                 default:
                     throw std::runtime_error("Unknown algorithm");
             }
