@@ -22,7 +22,7 @@ void DA_Encrypt::runProcess() {
 
     // Шифрование байтов блоками
     std::mt19937_64 seedRnd(seedKey); // Для каждого блока будет генерироваться отдельный коэффициент
-    for (uint64_t i = 0; i < rawBytes.size(); i += 2) {
+    for (uint64_t i = 0; i < rawBytes.size(); i += DA_Const::BLOCK_LENGTH) {
         // Двигаем биты на +1 влево для избежания деления на 0
         const uint16_t a = static_cast<uint16_t>(rawBytes[i]) + DA_Const::SHIFT;
         const uint16_t b = static_cast<uint16_t>(i + 1 < rawBytes.size() ? rawBytes[i + 1] : 0) + DA_Const::SHIFT;
@@ -46,7 +46,7 @@ void DA_Encrypt::runProcess() {
         const uint16_t Q = static_cast<uint16_t>(b / G) xor multiplierCoef;
 
         // Запись в блок
-        encryptedBlocks[i / 2] = {x, y, Q, G};
+        encryptedBlocks[i / DA_Const::BLOCK_LENGTH] = {x, y, Q, G};
     }
 }
 

@@ -27,7 +27,7 @@ private:
     const std::vector<uint8_t> *rawBytesPtr = nullptr;
     /// Вектор с зашифрованными байтами (блоками)
     std::vector<DA_Block> encryptedBlocks;
-    /// Генератор псевдослучайных чисел для коэффициента
+    /// Генератор псевдослучайных чисел для ключа
     std::mt19937_64 rnd{static_cast<uint64_t>(std::chrono::steady_clock::now().time_since_epoch().count())};
 
     DA_Encrypt() = default;
