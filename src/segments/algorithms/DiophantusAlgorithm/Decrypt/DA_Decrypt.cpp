@@ -1,7 +1,5 @@
 #include "DA_Decrypt.h"
 
-#include <stdexcept>
-
 
 void DA_Decrypt::clearOldData() {
     // Ничего не очищается - всё будет перезаписано в процессе алгоритма
