@@ -1,8 +1,11 @@
 #include "STA_Encrypt.h"
 
 
-void STA_Encrypt::clearOldData() {
-    // Ничего не очищается - всё будет перезаписано в процессе алгоритма
+void STA_Encrypt::clearData() {
+    seedKey = 0;
+    fullSum = 0;
+    rawBytesPtr = nullptr;
+    std::vector<STA_Block>().swap(encryptedBlocks);
 }
 
 

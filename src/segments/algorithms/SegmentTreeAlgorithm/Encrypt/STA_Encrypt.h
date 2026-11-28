@@ -34,7 +34,7 @@ private:
     STA_Encrypt() = default;
 
 protected:
-    void clearOldData() override;
+    void clearData() override;
 
     void prepareData(const FilePacket &inFilePacket) override;
 

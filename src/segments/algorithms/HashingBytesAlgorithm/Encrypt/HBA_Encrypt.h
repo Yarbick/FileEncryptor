@@ -2,6 +2,7 @@
 
 #include "segments/algorithms/BaseAlgorithm/BaseAlgorithm.h"
 #include "segments/algorithms/HashingBytesAlgorithm/shared/HBA_Constants.h"
+#include "segments/algorithms/HashingBytesAlgorithm/shared/HBA_DataStructs.h"
 #include "segments/shared/Constants.h"
 #include "segments/shared/DataStructs.h"
 
@@ -23,17 +24,17 @@ private:
     uint64_t hashBase = 0;
     /// Дополнительный коэффицент для умножения по модулю
     uint64_t subCoef = 0;
-    /// Вектор с байтами для хеширования
+    /// Вектор с байтами для шифрования
     const std::vector<uint8_t> *rawBytesPtr = nullptr;
-    /// Вектор с объединёнными захешированными байтами (блоками)
-    std::vector<uint64_t> hashedBlocks;
+    /// Вектор с зашифрованными байтами (блоками)
+    std::vector<HBA_Block> encryptedBlocks;
     /// Генератор псевдослучайных чисел для хешей
     std::mt19937_64 rnd{static_cast<uint64_t>(std::chrono::steady_clock::now().time_since_epoch().count())};
 
     HBA_Encrypt() = default;
 
 protected:
-    void clearOldData() override;
+    void clearData() override;
 
     void prepareData(const FilePacket &inFilePacket) override;
 

@@ -1,8 +1,10 @@
 #include "DA_Encrypt.h"
 
 
-void DA_Encrypt::clearOldData() {
-    // Ничего не очищается - всё будет перезаписано в процессе алгоритма
+void DA_Encrypt::clearData() {
+    seedKey = 0;
+    rawBytesPtr = nullptr;
+    std::vector<DA_Block>().swap(encryptedBlocks);
 }
 
 

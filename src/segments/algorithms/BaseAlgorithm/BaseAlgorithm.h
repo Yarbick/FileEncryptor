@@ -2,6 +2,8 @@
 
 #include "segments/shared/DataStructs.h"
 
+#include <stdexcept>
+
 
 /**
  * @brief Класс-родитель для алгоритмов
@@ -23,7 +25,7 @@ protected:
     /**
      * @brief Очистка алгоритма от старых данных
      */
-    virtual void clearOldData() = 0;
+    virtual void clearData() = 0;
 
     /**
      * @brief Подготавливает данные из файлового пакета для алгоритма

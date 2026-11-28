@@ -1,8 +1,11 @@
 #include "STA_Decrypt.h"
 
 
-void STA_Decrypt::clearOldData() {
-    // Ничего не очищается - всё будет перезаписано в процессе алгоритма
+void STA_Decrypt::clearData() {
+    seedKey = 0;
+    fullSum = 0;
+    std::vector<STA_Block>().swap(encryptedBlocks);
+    std::vector<uint8_t>().swap(rawBytes);
 }
 
 

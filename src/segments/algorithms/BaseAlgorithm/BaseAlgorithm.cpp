@@ -2,8 +2,13 @@
 
 
 void BaseAlgorithm::process(FilePacket &inFilePacket, ProcessResponse &processResponse) {
-    clearOldData();
-    prepareData(inFilePacket);
-    runProcess();
-    prepareResult(inFilePacket, processResponse);
+    try {
+        prepareData(inFilePacket);
+        runProcess();
+        prepareResult(inFilePacket, processResponse);
+    } catch (...) {
+        clearData();
+        throw;
+    }
+    clearData();
 }

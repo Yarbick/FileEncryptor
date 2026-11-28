@@ -1,8 +1,10 @@
 #include "DA_Decrypt.h"
 
 
-void DA_Decrypt::clearOldData() {
-    // Ничего не очищается - всё будет перезаписано в процессе алгоритма
+void DA_Decrypt::clearData() {
+    seedKey = 0;
+    std::vector<DA_Block>().swap(encryptedBlocks);
+    std::vector<uint8_t>().swap(rawBytes);
 }
 
 
@@ -81,6 +83,6 @@ void DA_Decrypt::runProcess() {
 
 
 void DA_Decrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &processResponse) {
-    // Запись дещифрованных байтов
+    // Запись расшифрованных байтов
     outFilePacket.data = std::move(rawBytes);
 }

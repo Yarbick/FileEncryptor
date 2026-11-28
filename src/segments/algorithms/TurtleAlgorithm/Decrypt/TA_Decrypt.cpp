@@ -1,8 +1,10 @@
 #include "TA_Decrypt.h"
 
 
-void TA_Decrypt::clearOldData() {
-    // Ничего не очищается - всё будет перезаписано в процессе алгоритма
+void TA_Decrypt::clearData() {
+    seedKey = 0;
+    std::vector<TA_Block>().swap(encryptedBlocks);
+    std::vector<uint8_t>().swap(rawBytes);
 }
 
 

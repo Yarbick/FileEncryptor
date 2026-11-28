@@ -3,6 +3,7 @@
 #include "segments/algorithms/BaseAlgorithm/BaseAlgorithm.h"
 #include "segments/algorithms/sharedFunctions/MathUtils/MathUtils.h"
 #include "segments/algorithms/HashingBytesAlgorithm/shared/HBA_Constants.h"
+#include "segments/algorithms/HashingBytesAlgorithm/shared/HBA_DataStructs.h"
 #include "segments/shared/Constants.h"
 #include "segments/shared/DataStructs.h"
 
@@ -10,6 +11,7 @@
 #include <cstdint>
 #include <string>
 #include <utility>
+#include <stdexcept>
 
 
 /**
@@ -23,15 +25,15 @@ private:
     uint64_t hashBase = 0;
     /// Дополнительный коэффицент для умножения по модулю
     uint64_t subCoef = 0;
-    /// Вектор с объединёнными хешированными байтами (блоками)
-    std::vector<uint64_t> hashBlocks;
-    /// Вектор с дехешированными байтами
+    /// Вектор с зашифрованными байтами (блоками)
+    std::vector<HBA_Block> encryptedBlocks;
+    /// Вектор с расшифрованными байтами
     std::vector<uint8_t> rawBytes;
 
     HBA_Decrypt() = default;
 
 protected:
-    void clearOldData() override;
+    void clearData() override;
 
     void prepareData(const FilePacket &inFilePacket) override;
 
