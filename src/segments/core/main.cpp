@@ -28,6 +28,7 @@ int main(int argc, char *argv[]) {
 
     if (alg == 1) query.algorithm = AlgorithmType::DA;
     else if (alg == 2) query.algorithm = AlgorithmType::TA;
+    else if (alg == 3) query.algorithm = AlgorithmType::STA;
 
     if (mode == 0) query.mode = ModeType::ENCRYPT;
     else query.mode = ModeType::DECRYPT;
