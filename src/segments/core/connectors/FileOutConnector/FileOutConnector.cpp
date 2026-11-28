@@ -19,7 +19,7 @@ namespace FileOutConnector {
 
 
         /// Сборка зашифрованного файла
-        void buildEncryptedFile(const std::string &filepath, const FilePacket &inFilePacket) {
+        void buildEncryptedFile(const std::filesystem::path &filepath, const FilePacket &inFilePacket) {
             std::ofstream fout(filepath, std::ios::binary);
             checkFile(fout);
 
@@ -41,28 +41,41 @@ namespace FileOutConnector {
             }
 
             buildFileBody(fout, inFilePacket);
+
+            // Проверка на успешную запись
+            if (!fout.good())
+                throw std::runtime_error("Failed to write file");
         }
 
         /// Сборка расшифрованного файла
-        void buildDecryptedFile(const std::string &filepath, const FilePacket &inFilePacket) {
+        void buildDecryptedFile(const std::filesystem::path &filepath, const FilePacket &inFilePacket) {
             std::ofstream fout(filepath, std::ios::binary);
             checkFile(fout);
 
             buildFileBody(fout, inFilePacket);
+
+            // Проверка на успешную запись
+            if (!fout.good())
+                throw std::runtime_error("Failed to write file");
         }
     }
 
 
-    void transmitData(const std::string &dirpath, const FilePacket &inFilePacket, const Query &query) {
+    void transmitData(const std::filesystem::path &dirpath, const FilePacket &inFilePacket, const Query &query) {
         // Сборка нужного пути к файлу и запуск передачи
-        std::string filepath = dirpath + '/';
+        std::filesystem::path outPath(dirpath);
+        std::string fullFilename = inFilePacket.params.at("filename");
+
         if (query.mode == ModeType::ENCRYPT) {
-            filepath += inFilePacket.params.at("filename") + '.' + ENCRYPTED_FILE_EXTENSION;
-            buildEncryptedFile(filepath, inFilePacket);
+            fullFilename += '.' + ENCRYPTED_FILE_EXTENSION;
         }
         if (query.mode == ModeType::DECRYPT) {
-            filepath += inFilePacket.params.at("filename") + '.' + inFilePacket.params.at("extension");
-            buildDecryptedFile(filepath, inFilePacket);
+            const std::string &extension = inFilePacket.params.at("extension");
+            if (!extension.empty()) fullFilename += '.' + extension;
         }
+        outPath /= std::filesystem::path(std::u8string(fullFilename.begin(), fullFilename.end()));
+
+        if (query.mode == ModeType::ENCRYPT) buildEncryptedFile(outPath, inFilePacket);
+        if (query.mode == ModeType::DECRYPT) buildDecryptedFile(outPath, inFilePacket);
     }
 }

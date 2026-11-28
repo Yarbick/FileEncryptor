@@ -88,7 +88,7 @@ void TA_Encrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &proce
         int prevSize = 0, currSize = sizeof(uint32_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
             outFilePacket.data[i * TA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.value & 0xFF);
-            value.value >>= BYTE;
+            value.value >>= BITS_PER_BYTE;
         }
     }
 }

@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <ios>
 #include <cstdint>
+#include <filesystem>
 
 
 /**
@@ -18,8 +19,8 @@ namespace FileOutConnector {
     /**
      * @brief Запуск транспортировки данных
      * @param dirpath Путь к папке, в которую сохранится файл
-     * @param inFilePacket Данные, которые сохранятся в файла
+     * @param inFilePacket Данные, которые сохранятся в файл
      * @param query Настройки запроса
      */
-    void transmitData(const std::string &dirpath, const FilePacket &inFilePacket, const Query &query);
+    void transmitData(const std::filesystem::path &dirpath, const FilePacket &inFilePacket, const Query &query);
 }

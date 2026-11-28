@@ -23,7 +23,7 @@ void TA_Decrypt::prepareData(const FilePacket &inFilePacket) {
 
         int prevSize = 0, currSize = sizeof(uint32_t);
         for (int byteIdx = prevSize; byteIdx < currSize; byteIdx++) {
-            encryptedBlocks[i].value = (encryptedBlocks[i].value << BYTE) | inFilePacket.data[
+            encryptedBlocks[i].value = (encryptedBlocks[i].value << BITS_PER_BYTE) | inFilePacket.data[
                                            i * TA_Const::BLOCK_SIZE + byteIdx];
         }
     }

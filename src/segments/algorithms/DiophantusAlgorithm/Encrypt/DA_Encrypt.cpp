@@ -66,25 +66,25 @@ void DA_Encrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &proce
         int prevSize = 0, currSize = sizeof(int32_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
             outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.x & 0xFF);
-            value.x >>= BYTE;
+            value.x >>= BITS_PER_BYTE;
         }
 
         prevSize = currSize, currSize += sizeof(int32_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
             outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.y & 0xFF);
-            value.y >>= BYTE;
+            value.y >>= BITS_PER_BYTE;
         }
 
         prevSize = currSize, currSize += sizeof(uint16_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
             outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.Q & 0xFF);
-            value.Q >>= BYTE;
+            value.Q >>= BITS_PER_BYTE;
         }
 
         prevSize = currSize, currSize += sizeof(uint16_t);
         for (int byteIdx = currSize - 1; byteIdx >= prevSize; byteIdx--) {
             outFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value.G & 0xFF);
-            value.G >>= BYTE;
+            value.G >>= BITS_PER_BYTE;
         }
     }
 }

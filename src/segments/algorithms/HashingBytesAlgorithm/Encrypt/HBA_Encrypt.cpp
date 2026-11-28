@@ -58,7 +58,7 @@ void HBA_Encrypt::prepareResult(FilePacket &outFilePacket, ProcessResponse &proc
 
         for (int byteIdx = HBA_Const::BLOCK_SIZE - 1; byteIdx >= 0; byteIdx--) {
             outFilePacket.data[i * HBA_Const::BLOCK_SIZE + byteIdx] = static_cast<uint8_t>(value & 0xFF);
-            value >>= BYTE;
+            value >>= BITS_PER_BYTE;
         }
     }
 }

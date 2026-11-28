@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <utility>
 #include <string>
+#include <filesystem>
 
 
 /**
@@ -30,6 +31,6 @@ namespace Core {
      * @param query Настройки запроса
      * @return Статус ответа программы
      */
-    ProcessResponse processQuery(const std::string &inFilepath, std::string &outDirpath, FilePacket &mainFilePacket,
-                                 const Query &query);
+    ProcessResponse processQuery(const std::filesystem::path &inFilepath, const std::filesystem::path &outDirpath,
+                                 FilePacket &mainFilePacket, const Query &query);
 }

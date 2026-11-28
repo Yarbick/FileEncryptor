@@ -4,35 +4,26 @@
 namespace Core {
     namespace {
         /// Обработка пути и извлечение нужной информации из него
-        void preparePaths(const std::string &inFilepath, std::string &outDirpath, FilePacket &inFilePacket,
-                          const Query &query) {
+        void preparePaths(const std::filesystem::path &inFilepath, const std::filesystem::path &outDirpath,
+                          FilePacket &inFilePacket, const Query &query) {
             // Обрабатока пути к папке для сохранения
-            if (outDirpath.empty())
+            if (outDirpath.empty() || !std::filesystem::exists(outDirpath) || !
+                std::filesystem::is_directory(outDirpath))
                 throw std::runtime_error("Invalid output dirpath");
-            if (outDirpath.back() == '/' || outDirpath.back() == '\\')
-                outDirpath.pop_back();
 
             // При расшифровке все данные уже находятся в зашифрованном файле
             if (query.mode == ModeType::DECRYPT) return;
 
-            // Отделяем от пути к файлу с данными имя и расширение
-            int extensionSeparatorIdx = -1, filenameSeparatorIdx = -1;
-            for (int idx = static_cast<int>(inFilepath.size() - 1); idx >= 0; idx--) {
-                if (inFilepath[idx] == '.' and extensionSeparatorIdx == -1)
-                    extensionSeparatorIdx = idx;
-                if (inFilepath[idx] == '/' || inFilepath[idx] == '\\') {
-                    filenameSeparatorIdx = idx;
-                    break;
-                }
-            }
-
-            if (extensionSeparatorIdx == -1 or filenameSeparatorIdx == -1)
+            // Проверка пути с данными
+            if (!std::filesystem::is_regular_file(inFilepath) || !inFilepath.has_stem())
                 throw std::runtime_error("Invalid input filepath");
 
-            const int filenameLength = extensionSeparatorIdx - filenameSeparatorIdx - 1;
+            // Получение данных из пути
+            const auto stemU8 = inFilepath.stem().u8string();
+            inFilePacket.params["filename"] = std::string(stemU8.begin(), stemU8.end());
 
-            inFilePacket.params["filename"] = inFilepath.substr(filenameSeparatorIdx + 1, filenameLength);
-            inFilePacket.params["extension"] = inFilepath.substr(extensionSeparatorIdx + 1);
+            const auto extU8 = inFilepath.extension().u8string();
+            inFilePacket.params["extension"] = extU8.size() > 1 ? std::string(extU8.begin() + 1, extU8.end()) : "";
         }
 
 
@@ -72,11 +63,23 @@ namespace Core {
                     throw std::runtime_error("Unknown algorithm");
             }
         }
+
+
+        /// Вычисление хеша для проверки файлов
+        uint64_t computeCheckSum(const std::vector<uint8_t> &data) {
+            uint64_t hash = 14695981039346656037ull;
+            for (const uint8_t byte: data) {
+                hash ^= byte;
+                hash *= 1099511628211ull;
+            }
+
+            return hash;
+        }
     }
 
 
-    ProcessResponse processQuery(const std::string &inFilepath, std::string &outDirpath, FilePacket &mainFilePacket,
-                                 const Query &query) {
+    ProcessResponse processQuery(const std::filesystem::path &inFilepath, const std::filesystem::path &outDirpath,
+                                 FilePacket &mainFilePacket, const Query &query) {
         try {
             ProcessResponse processResponse;
 
@@ -89,6 +92,9 @@ namespace Core {
             BaseAlgorithm &HBA_Algorithm = getAlgorithm({AlgorithmType::HBA, query.mode});
 
             if (query.mode == ModeType::ENCRYPT) {
+                // Создание хеша для проверки на целостность файла
+                mainFilePacket.params["checkSum"] = std::to_string(computeCheckSum(mainFilePacket.data));
+
                 // Общая шифровка через хеширование байтов
                 HBA_Algorithm.process(mainFilePacket, processResponse);
                 // Основная шифровка через выбранный пользователем алгоритм
@@ -104,6 +110,12 @@ namespace Core {
                 main_Algorithm.process(mainFilePacket, processResponse);
                 // Общая расшифровка через дехеширование байтов
                 HBA_Algorithm.process(mainFilePacket, processResponse);
+
+                // Проверка на целостность файла
+                if (!mainFilePacket.params.contains("checkSum") || mainFilePacket.params["checkSum"] != std::to_string(
+                        computeCheckSum(mainFilePacket.data))) {
+                    throw std::runtime_error("Invalid key or corrupted file");
+                }
             }
 
             // Сохранение результата в файл

@@ -61,7 +61,7 @@ namespace FileInConnector {
 
 
         /// Загрузка файла для шифровки
-        void loadUserFile(const std::string &filepath, FilePacket &outFilePacket) {
+        void loadUserFile(const std::filesystem::path &filepath, FilePacket &outFilePacket) {
             std::ifstream fin(filepath, std::ios::binary);
             checkFile(fin);
 
@@ -69,7 +69,7 @@ namespace FileInConnector {
         }
 
         /// Загрузка файла для расшифровки
-        void loadEncryptedFile(const std::string &filepath, FilePacket &outFilePacket) {
+        void loadEncryptedFile(const std::filesystem::path &filepath, FilePacket &outFilePacket) {
             std::ifstream fin(filepath, std::ios::binary);
             checkEncryptedFile(fin);
 
@@ -96,7 +96,7 @@ namespace FileInConnector {
     }
 
 
-    void transmitData(const std::string &filepath, FilePacket &outFilePacket, const Query &query) {
+    void transmitData(const std::filesystem::path &filepath, FilePacket &outFilePacket, const Query &query) {
         if (query.mode == ModeType::ENCRYPT)
             loadUserFile(filepath, outFilePacket);
         if (query.mode == ModeType::DECRYPT)

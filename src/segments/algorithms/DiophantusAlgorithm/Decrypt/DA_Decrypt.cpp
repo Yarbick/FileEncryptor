@@ -24,26 +24,26 @@ void DA_Decrypt::prepareData(const FilePacket &inFilePacket) {
         int prevSize = 0, currSize = sizeof(int32_t);
         uint32_t ux = 0;
         for (int byteIdx = prevSize; byteIdx < currSize; byteIdx++) {
-            ux = (ux << BYTE) | inFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx];
+            ux = (ux << BITS_PER_BYTE) | inFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx];
         }
         encryptedBlocks[i].x = static_cast<int32_t>(ux);
 
         prevSize = currSize, currSize += sizeof(int32_t);
         uint32_t yx = 0;
         for (int byteIdx = prevSize; byteIdx < currSize; byteIdx++) {
-            yx = (yx << BYTE) | inFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx];
+            yx = (yx << BITS_PER_BYTE) | inFilePacket.data[i * DA_Const::BLOCK_SIZE + byteIdx];
         }
         encryptedBlocks[i].y = static_cast<int32_t>(yx);
 
         prevSize = currSize, currSize += sizeof(uint16_t);
         for (int byteIdx = prevSize; byteIdx < currSize; byteIdx++) {
-            encryptedBlocks[i].Q = (encryptedBlocks[i].Q << BYTE) | inFilePacket.data[
+            encryptedBlocks[i].Q = (encryptedBlocks[i].Q << BITS_PER_BYTE) | inFilePacket.data[
                                        i * DA_Const::BLOCK_SIZE + byteIdx];
         }
 
         prevSize = currSize, currSize += sizeof(uint16_t);
         for (int byteIdx = prevSize; byteIdx < currSize; byteIdx++) {
-            encryptedBlocks[i].G = (encryptedBlocks[i].G << BYTE) | inFilePacket.data[
+            encryptedBlocks[i].G = (encryptedBlocks[i].G << BITS_PER_BYTE) | inFilePacket.data[
                                        i * DA_Const::BLOCK_SIZE + byteIdx];
         }
     }

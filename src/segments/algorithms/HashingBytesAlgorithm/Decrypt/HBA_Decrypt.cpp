@@ -29,7 +29,7 @@ void HBA_Decrypt::prepareData(const FilePacket &inFilePacket) {
         hashBlocks[i] = 0;
 
         for (int byteIdx = 0; byteIdx < HBA_Const::BLOCK_SIZE; byteIdx++) {
-            hashBlocks[i] = (hashBlocks[i] << BYTE) | inFilePacket.data[i * HBA_Const::BLOCK_SIZE + byteIdx];
+            hashBlocks[i] = (hashBlocks[i] << BITS_PER_BYTE) | inFilePacket.data[i * HBA_Const::BLOCK_SIZE + byteIdx];
         }
     }
 }
